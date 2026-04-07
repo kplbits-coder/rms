@@ -1,0 +1,51 @@
+### Create a restaurant
+POST http://localhost:4000/restaurants
+Content-Type: application/json
+
+{
+  "name": "Oceanview Bistro",
+  "address": "123 Harbor Lane",
+  "phone": "555-1234",
+  "cuisine": "Seafood"
+}
+
+### Get all restaurants
+GET http://localhost:4000/restaurants
+
+### Create a table
+POST http://localhost:4000/tables
+Content-Type: application/json
+
+{
+  "number": 5,
+  "seats": 4,
+  "location": "Patio"
+}
+
+### Create a menu item for restaurant 1
+POST http://localhost:4000/restaurants/1/menus
+Content-Type: application/json
+
+{
+  "title": "Grilled Salmon",
+  "description": "Served with seasonal vegetables",
+  "price": 22.5,
+  "category": "Entree"
+}
+
+### Create an order
+POST http://localhost:4000/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "tableId": 1,
+  "items": [
+    { "menuId": 1, "quantity": 2 }
+  ],
+  "customerName": "Alex",
+  "status": "pending"
+}
+
+### Retrieve all orders
+GET http://localhost:4000/orders
