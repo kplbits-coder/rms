@@ -1,0 +1,211 @@
+{
+	"info": {
+		"_postman_id": "1480afb0-fe1a-4e9e-b22a-d0dc3d523ece",
+		"name": "RMS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "53793190",
+		"_collection_link": "https://kplbits-3722189.postman.co/workspace/Kapil's-Workspace~dc6a3e4e-57bf-4a27-8e1c-253bcbda3d34/collection/53793190-1480afb0-fe1a-4e9e-b22a-d0dc3d523ece?action=share&source=collection_link&creator=53793190"
+	},
+	"item": [
+		{
+			"name": "GetOrder",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetRestaurent",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateTable",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"number\": 5,\r\n    \"seats\": 4,\r\n    \"location\": \"Patio\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/tables",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"tables"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"restaurantId\": 1,\r\n    \"tableId\": 2,\r\n    \"items\": [\r\n        {\r\n            \"menuId\": 1,\r\n            \"quantity\": 2\r\n        }\r\n    ],\r\n    \"customerName\": \"Harry\",\r\n    \"status\": \"pending\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Restaurent",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Oceanview Bistro\",\r\n  \"address\": \"123 Harbor Lane\",\r\n  \"phone\": \"555-1234\",\r\n  \"cuisine\": \"Seafood\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/restaurants",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"restaurants"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Menu",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Grilled Salmon\",\r\n  \"description\": \"Served with seasonal vegetables\",\r\n  \"price\": 22.5,\r\n  \"category\": \"Entree\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/restaurants/1/menus",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"restaurants",
+						"1",
+						"menus"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Table",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/tables",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"tables"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateOrder",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\": \"completed\",\r\n    \"customerName\": \"Ramsey\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/orders/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"orders",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
