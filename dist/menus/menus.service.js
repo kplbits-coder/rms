@@ -8,65 +8,74 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenusService = void 0;
 const common_1 = require("@nestjs/common");
-const restaurants_service_1 = require("../restaurants/restaurants.service");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const menu_entity_1 = require("../entities/menu.entity");
+const restaurant_entity_1 = require("../entities/restaurant.entity");
 let MenusService = class MenusService {
-    constructor(restaurantsService) {
-        this.restaurantsService = restaurantsService;
-        this.menus = [];
-        this.nextId = 1;
+    constructor(menuRepository, restaurantRepository) {
+        this.menuRepository = menuRepository;
+        this.restaurantRepository = restaurantRepository;
     }
-    create(restaurantId, createMenuDto) {
-        this.restaurantsService.findOne(restaurantId);
+    async create(restaurantId, createMenuDto) {
+        const restaurant = await this.restaurantRepository.findOneBy({ id: restaurantId });
+        if (!restaurant) {
+            throw new common_1.NotFoundException('Restaurant not found.');
+        }
         if (!createMenuDto.title || createMenuDto.price == null) {
             throw new common_1.BadRequestException('Title and price are required.');
         }
-        const menu = {
-            id: this.nextId++,
-            restaurantId,
-            title: createMenuDto.title,
-            description: createMenuDto.description || null,
-            price: Number(createMenuDto.price),
+        const menu = this.menuRepository.create({
+            ...createMenuDto,
             category: createMenuDto.category || 'Main',
-            createdAt: new Date().toISOString(),
-        };
-        this.menus.push(menu);
-        return menu;
+            restaurant,
+            restaurantId,
+        });
+        return this.menuRepository.save(menu);
     }
-    findByRestaurant(restaurantId) {
-        this.restaurantsService.findOne(restaurantId);
-        return this.menus.filter(m => m.restaurantId === restaurantId);
+    async findByRestaurant(restaurantId) {
+        const restaurant = await this.restaurantRepository.findOneBy({ id: restaurantId });
+        if (!restaurant) {
+            throw new common_1.NotFoundException('Restaurant not found.');
+        }
+        return this.menuRepository.find({ where: { restaurantId } });
     }
-    update(restaurantId, menuId, updateMenuDto) {
-        this.restaurantsService.findOne(restaurantId);
-        const menu = this.menus.find(m => m.id === menuId && m.restaurantId === restaurantId);
+    async update(restaurantId, menuId, updateMenuDto) {
+        const restaurant = await this.restaurantRepository.findOneBy({ id: restaurantId });
+        if (!restaurant) {
+            throw new common_1.NotFoundException('Restaurant not found.');
+        }
+        const menu = await this.menuRepository.findOne({
+            where: { id: menuId, restaurantId },
+        });
         if (!menu) {
             throw new common_1.NotFoundException('Menu item not found.');
         }
-        if (updateMenuDto.title)
-            menu.title = updateMenuDto.title;
-        if (updateMenuDto.description !== undefined)
-            menu.description = updateMenuDto.description;
-        if (updateMenuDto.price != null)
-            menu.price = Number(updateMenuDto.price);
-        if (updateMenuDto.category)
-            menu.category = updateMenuDto.category;
-        menu.updatedAt = new Date().toISOString();
-        return menu;
+        Object.assign(menu, updateMenuDto, { updatedAt: new Date() });
+        return this.menuRepository.save(menu);
     }
-    remove(restaurantId, menuId) {
-        this.restaurantsService.findOne(restaurantId);
-        const index = this.menus.findIndex(m => m.id === menuId && m.restaurantId === restaurantId);
-        if (index === -1) {
+    async remove(restaurantId, menuId) {
+        const restaurant = await this.restaurantRepository.findOneBy({ id: restaurantId });
+        if (!restaurant) {
+            throw new common_1.NotFoundException('Restaurant not found.');
+        }
+        const result = await this.menuRepository.delete({ id: menuId, restaurantId });
+        if (result.affected === 0) {
             throw new common_1.NotFoundException('Menu item not found.');
         }
-        this.menus.splice(index, 1);
     }
 };
 exports.MenusService = MenusService;
 exports.MenusService = MenusService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [restaurants_service_1.RestaurantsService])
+    __param(0, (0, typeorm_1.InjectRepository)(menu_entity_1.MenuEntity)),
+    __param(1, (0, typeorm_1.InjectRepository)(restaurant_entity_1.RestaurantEntity)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], MenusService);

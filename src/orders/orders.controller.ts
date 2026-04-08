@@ -7,33 +7,33 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.ordersService.findAll();
   }
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
+  async create(@Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.create(createOrderDto);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.ordersService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateOrderDto: UpdateOrderDto) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateOrderDto: UpdateOrderDto) {
     return this.ordersService.update(id, updateOrderDto);
   }
 
   @Post(':id/complete')
-  complete(@Param('id', ParseIntPipe) id: number) {
+  async complete(@Param('id', ParseIntPipe) id: number) {
     return this.ordersService.complete(id);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    this.ordersService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.ordersService.remove(id);
     return {};
   }
 }

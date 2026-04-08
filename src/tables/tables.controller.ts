@@ -7,28 +7,28 @@ export class TablesController {
   constructor(private readonly tablesService: TablesService) {}
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.tablesService.findAll();
   }
 
   @Post()
-  create(@Body() createTableDto: CreateTableDto) {
+  async create(@Body() createTableDto: CreateTableDto) {
     return this.tablesService.create(createTableDto);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.tablesService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateTableDto: UpdateTableDto) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateTableDto: UpdateTableDto) {
     return this.tablesService.update(id, updateTableDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    this.tablesService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.tablesService.remove(id);
     return {};
   }
 }

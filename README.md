@@ -22,6 +22,8 @@ Or run in development mode with auto-reload:
 npm run dev
 ```
 
+> This project now uses SQLite via TypeORM and stores data in `database.sqlite` in the project root.
+
 ## API Endpoints
 
 - `GET /restaurants`
@@ -86,5 +88,6 @@ curl http://localhost:4000/orders
 
 ## Notes
 
-- This implementation uses in-memory storage. Restarting the server resets all data.
-- You can extend it with a database like SQLite, PostgreSQL, or MongoDB.
+- This implementation now uses SQLite with TypeORM.
+- Data is persisted to `database.sqlite` in the project root.
+- Restarting the server will no longer reset data unless you delete `database.sqlite`.

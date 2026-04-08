@@ -1,26 +1,18 @@
-import { RestaurantsService } from '../restaurants/restaurants.service';
-import { TablesService } from '../tables/tables.service';
+import { Repository } from 'typeorm';
 import { CreateOrderDto, UpdateOrderDto } from './orders.dto';
-export interface Order {
-    id: number;
-    restaurantId: number;
-    tableId: number;
-    items: any[];
-    customerName: string;
-    status: string;
-    createdAt: string;
-    updatedAt?: string;
-}
+import { OrderEntity } from '../entities/order.entity';
+import { RestaurantEntity } from '../entities/restaurant.entity';
+import { TableEntity } from '../entities/table.entity';
 export declare class OrdersService {
-    private restaurantsService;
-    private tablesService;
-    private orders;
-    private nextId;
-    constructor(restaurantsService: RestaurantsService, tablesService: TablesService);
-    create(createOrderDto: CreateOrderDto): Order;
-    findAll(): Order[];
-    findOne(id: number): Order;
-    update(id: number, updateOrderDto: UpdateOrderDto): Order;
-    complete(id: number): Order;
-    remove(id: number): void;
+    private readonly orderRepository;
+    private readonly restaurantRepository;
+    private readonly tableRepository;
+    constructor(orderRepository: Repository<OrderEntity>, restaurantRepository: Repository<RestaurantEntity>, tableRepository: Repository<TableEntity>);
+    create(createOrderDto: CreateOrderDto): Promise<OrderEntity>;
+    findAll(): Promise<OrderEntity[]>;
+    findOne(id: number): Promise<OrderEntity>;
+    update(id: number, updateOrderDto: UpdateOrderDto): Promise<OrderEntity>;
+    complete(id: number): Promise<OrderEntity>;
+    remove(id: number): Promise<void>;
+    private releaseTable;
 }

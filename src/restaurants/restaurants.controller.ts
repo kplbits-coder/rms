@@ -12,23 +12,23 @@ export class RestaurantsController {
   }
 
   @Post()
-  create(@Body() createRestaurantDto: CreateRestaurantDto) {
+  async create(@Body() createRestaurantDto: CreateRestaurantDto) {
     return this.restaurantsService.create(createRestaurantDto);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.restaurantsService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateRestaurantDto: UpdateRestaurantDto) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateRestaurantDto: UpdateRestaurantDto) {
     return this.restaurantsService.update(id, updateRestaurantDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    this.restaurantsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.restaurantsService.remove(id);
     return {};
   }
 }

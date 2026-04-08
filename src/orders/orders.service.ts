@@ -1,88 +1,88 @@
 import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
-import { RestaurantsService } from '../restaurants/restaurants.service';
-import { TablesService } from '../tables/tables.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateOrderDto, UpdateOrderDto } from './orders.dto';
-
-export interface Order {
-  id: number;
-  restaurantId: number;
-  tableId: number;
-  items: any[];
-  customerName: string;
-  status: string;
-  createdAt: string;
-  updatedAt?: string;
-}
+import { OrderEntity } from '../entities/order.entity';
+import { RestaurantEntity } from '../entities/restaurant.entity';
+import { TableEntity } from '../entities/table.entity';
 
 @Injectable()
 export class OrdersService {
-  private orders: Order[] = [];
-  private nextId = 1;
-
   constructor(
-    private restaurantsService: RestaurantsService,
-    private tablesService: TablesService
+    @InjectRepository(OrderEntity)
+    private readonly orderRepository: Repository<OrderEntity>,
+    @InjectRepository(RestaurantEntity)
+    private readonly restaurantRepository: Repository<RestaurantEntity>,
+    @InjectRepository(TableEntity)
+    private readonly tableRepository: Repository<TableEntity>,
   ) {}
 
-  create(createOrderDto: CreateOrderDto): Order {
+  async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
     const { restaurantId, tableId, items, customerName, status } = createOrderDto;
 
     if (!restaurantId || !tableId || !Array.isArray(items) || items.length === 0) {
       throw new BadRequestException('restaurantId, tableId and at least one item are required.');
     }
 
-    this.restaurantsService.findOne(restaurantId);
-    const table = this.tablesService.findOne(tableId);
+    const restaurant = await this.restaurantRepository.findOneBy({ id: restaurantId });
+    if (!restaurant) {
+      throw new NotFoundException('Restaurant not found.');
+    }
+
+    const table = await this.tableRepository.findOneBy({ id: tableId });
+    if (!table) {
+      throw new NotFoundException('Table not found.');
+    }
 
     if (table.status === 'occupied') {
       throw new ConflictException('Table is already occupied.');
     }
 
-    const order: Order = {
-      id: this.nextId++,
+    const order = this.orderRepository.create({
+      restaurant,
       restaurantId,
+      table,
       tableId,
       items,
       customerName: customerName || 'Guest',
       status: status || 'pending',
-      createdAt: new Date().toISOString(),
-    };
+    });
 
-    this.orders.push(order);
-    this.tablesService.setTableStatus(tableId, 'occupied', order.id);
-    return order;
+    const savedOrder = await this.orderRepository.save(order);
+    await this.tableRepository.save({ ...table, status: 'occupied', currentOrderId: savedOrder.id });
+    return savedOrder;
   }
 
-  findAll(): Order[] {
-    return this.orders;
+  findAll(): Promise<OrderEntity[]> {
+    return this.orderRepository.find();
   }
 
-  findOne(id: number): Order {
-    const order = this.orders.find(o => o.id === id);
+  async findOne(id: number): Promise<OrderEntity> {
+    const order = await this.orderRepository.findOneBy({ id });
     if (!order) {
       throw new NotFoundException('Order not found.');
     }
     return order;
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto): Order {
-    const order = this.findOne(id);
+  async update(id: number, updateOrderDto: UpdateOrderDto): Promise<OrderEntity> {
+    const order = await this.findOne(id);
 
     if (updateOrderDto.items) order.items = updateOrderDto.items;
     if (updateOrderDto.customerName) order.customerName = updateOrderDto.customerName;
     if (updateOrderDto.status) {
       order.status = updateOrderDto.status;
       if (updateOrderDto.status === 'completed' || updateOrderDto.status === 'cancelled') {
-        this.tablesService.releaseTable(order.tableId, order.id);
+        await this.releaseTable(order.tableId, order.id);
       }
     }
-    order.updatedAt = new Date().toISOString();
 
-    return order;
+    order.updatedAt = new Date();
+    return this.orderRepository.save(order);
   }
 
-  complete(id: number): Order {
-    const order = this.findOne(id);
+  async complete(id: number): Promise<OrderEntity> {
+    const order = await this.findOne(id);
 
     if (order.status === 'completed') {
       throw new BadRequestException('Order is already completed.');
@@ -92,20 +92,32 @@ export class OrdersService {
     }
 
     order.status = 'completed';
-    order.updatedAt = new Date().toISOString();
-    this.tablesService.releaseTable(order.tableId, order.id);
+    order.updatedAt = new Date();
+    const savedOrder = await this.orderRepository.save(order);
+    await this.releaseTable(order.tableId, order.id);
 
-    return order;
+    return savedOrder;
   }
 
-  remove(id: number): void {
-    const index = this.orders.findIndex(o => o.id === id);
-    if (index === -1) {
+  async remove(id: number): Promise<void> {
+    const order = await this.orderRepository.findOneBy({ id });
+    if (!order) {
       throw new NotFoundException('Order not found.');
     }
 
-    const order = this.orders[index];
-    this.tablesService.releaseTable(order.tableId, order.id);
-    this.orders.splice(index, 1);
+    if (order.tableId) {
+      await this.releaseTable(order.tableId, order.id);
+    }
+
+    await this.orderRepository.delete(id);
+  }
+
+  private async releaseTable(tableId: number, currentOrderId: number): Promise<void> {
+    const table = await this.tableRepository.findOneBy({ id: tableId });
+    if (table && table.currentOrderId === currentOrderId) {
+      table.status = 'available';
+      table.currentOrderId = null;
+      await this.tableRepository.save(table);
+    }
   }
 }

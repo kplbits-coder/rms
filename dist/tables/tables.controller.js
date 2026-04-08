@@ -20,20 +20,20 @@ let TablesController = class TablesController {
     constructor(tablesService) {
         this.tablesService = tablesService;
     }
-    findAll() {
+    async findAll() {
         return this.tablesService.findAll();
     }
-    create(createTableDto) {
+    async create(createTableDto) {
         return this.tablesService.create(createTableDto);
     }
-    findOne(id) {
+    async findOne(id) {
         return this.tablesService.findOne(id);
     }
-    update(id, updateTableDto) {
+    async update(id, updateTableDto) {
         return this.tablesService.update(id, updateTableDto);
     }
-    remove(id) {
-        this.tablesService.remove(id);
+    async remove(id) {
+        await this.tablesService.remove(id);
         return {};
     }
 };
@@ -42,21 +42,21 @@ __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TablesController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [tables_dto_1.CreateTableDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TablesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TablesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Put)(':id'),
@@ -64,14 +64,14 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, tables_dto_1.UpdateTableDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TablesController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TablesController.prototype, "remove", null);
 exports.TablesController = TablesController = __decorate([
     (0, common_1.Controller)('tables'),

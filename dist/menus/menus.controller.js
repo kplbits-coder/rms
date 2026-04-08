@@ -20,17 +20,17 @@ let MenusController = class MenusController {
     constructor(menusService) {
         this.menusService = menusService;
     }
-    findByRestaurant(restaurantId) {
+    async findByRestaurant(restaurantId) {
         return this.menusService.findByRestaurant(restaurantId);
     }
-    create(restaurantId, createMenuDto) {
+    async create(restaurantId, createMenuDto) {
         return this.menusService.create(restaurantId, createMenuDto);
     }
-    update(restaurantId, menuId, updateMenuDto) {
+    async update(restaurantId, menuId, updateMenuDto) {
         return this.menusService.update(restaurantId, menuId, updateMenuDto);
     }
-    remove(restaurantId, menuId) {
-        this.menusService.remove(restaurantId, menuId);
+    async remove(restaurantId, menuId) {
+        await this.menusService.remove(restaurantId, menuId);
         return {};
     }
 };
@@ -40,7 +40,7 @@ __decorate([
     __param(0, (0, common_1.Param)('restaurantId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], MenusController.prototype, "findByRestaurant", null);
 __decorate([
     (0, common_1.Post)(),
@@ -48,7 +48,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, menus_dto_1.CreateMenuDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], MenusController.prototype, "create", null);
 __decorate([
     (0, common_1.Put)(':menuId'),
@@ -57,7 +57,7 @@ __decorate([
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Number, menus_dto_1.UpdateMenuDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], MenusController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':menuId'),
@@ -65,7 +65,7 @@ __decorate([
     __param(1, (0, common_1.Param)('menuId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], MenusController.prototype, "remove", null);
 exports.MenusController = MenusController = __decorate([
     (0, common_1.Controller)('restaurants/:restaurantId/menus'),

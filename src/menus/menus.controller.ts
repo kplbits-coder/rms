@@ -7,17 +7,17 @@ export class MenusController {
   constructor(private readonly menusService: MenusService) {}
 
   @Get()
-  findByRestaurant(@Param('restaurantId', ParseIntPipe) restaurantId: number) {
+  async findByRestaurant(@Param('restaurantId', ParseIntPipe) restaurantId: number) {
     return this.menusService.findByRestaurant(restaurantId);
   }
 
   @Post()
-  create(@Param('restaurantId', ParseIntPipe) restaurantId: number, @Body() createMenuDto: CreateMenuDto) {
+  async create(@Param('restaurantId', ParseIntPipe) restaurantId: number, @Body() createMenuDto: CreateMenuDto) {
     return this.menusService.create(restaurantId, createMenuDto);
   }
 
   @Put(':menuId')
-  update(
+  async update(
     @Param('restaurantId', ParseIntPipe) restaurantId: number,
     @Param('menuId', ParseIntPipe) menuId: number,
     @Body() updateMenuDto: UpdateMenuDto
@@ -26,11 +26,11 @@ export class MenusController {
   }
 
   @Delete(':menuId')
-  remove(
+  async remove(
     @Param('restaurantId', ParseIntPipe) restaurantId: number,
     @Param('menuId', ParseIntPipe) menuId: number
   ) {
-    this.menusService.remove(restaurantId, menuId);
+    await this.menusService.remove(restaurantId, menuId);
     return {};
   }
 }

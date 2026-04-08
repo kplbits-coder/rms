@@ -1,22 +1,14 @@
+import { Repository } from 'typeorm';
 import { CreateTableDto, UpdateTableDto } from './tables.dto';
-export interface Table {
-    id: number;
-    number: number;
-    seats: number;
-    location: string;
-    status: string;
-    currentOrderId: number | null;
-    createdAt: string;
-    updatedAt?: string;
-}
+import { TableEntity } from '../entities/table.entity';
 export declare class TablesService {
-    private tables;
-    private nextId;
-    create(createTableDto: CreateTableDto): Table;
-    findAll(): Table[];
-    findOne(id: number): Table;
-    update(id: number, updateTableDto: UpdateTableDto): Table;
-    remove(id: number): void;
-    setTableStatus(tableId: number, status: string, currentOrderId?: number | null): void;
-    releaseTable(tableId: number, currentOrderId: number): void;
+    private readonly tableRepository;
+    constructor(tableRepository: Repository<TableEntity>);
+    create(createTableDto: CreateTableDto): Promise<TableEntity>;
+    findAll(): Promise<TableEntity[]>;
+    findOne(id: number): Promise<TableEntity>;
+    update(id: number, updateTableDto: UpdateTableDto): Promise<TableEntity>;
+    remove(id: number): Promise<void>;
+    setTableStatus(tableId: number, status: string, currentOrderId?: number | null): Promise<void>;
+    releaseTable(tableId: number, currentOrderId: number): Promise<void>;
 }

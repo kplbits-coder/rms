@@ -1,19 +1,12 @@
+import { Repository } from 'typeorm';
 import { CreateRestaurantDto, UpdateRestaurantDto } from './restaurants.dto';
-export interface Restaurant {
-    id: number;
-    name: string;
-    address: string;
-    phone?: string;
-    cuisine?: string;
-    createdAt: string;
-    updatedAt?: string;
-}
+import { RestaurantEntity } from '../entities/restaurant.entity';
 export declare class RestaurantsService {
-    private restaurants;
-    private nextId;
-    create(createRestaurantDto: CreateRestaurantDto): Restaurant;
-    findAll(): Restaurant[];
-    findOne(id: number): Restaurant;
-    update(id: number, updateRestaurantDto: UpdateRestaurantDto): Restaurant;
-    remove(id: number): void;
+    private readonly restaurantRepository;
+    constructor(restaurantRepository: Repository<RestaurantEntity>);
+    create(createRestaurantDto: CreateRestaurantDto): Promise<RestaurantEntity>;
+    findAll(): Promise<RestaurantEntity[]>;
+    findOne(id: number): Promise<RestaurantEntity>;
+    update(id: number, updateRestaurantDto: UpdateRestaurantDto): Promise<RestaurantEntity>;
+    remove(id: number): Promise<void>;
 }

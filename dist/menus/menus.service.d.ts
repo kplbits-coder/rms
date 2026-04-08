@@ -1,22 +1,13 @@
-import { RestaurantsService } from '../restaurants/restaurants.service';
+import { Repository } from 'typeorm';
 import { CreateMenuDto, UpdateMenuDto } from './menus.dto';
-export interface Menu {
-    id: number;
-    restaurantId: number;
-    title: string;
-    description?: string;
-    price: number;
-    category: string;
-    createdAt: string;
-    updatedAt?: string;
-}
+import { MenuEntity } from '../entities/menu.entity';
+import { RestaurantEntity } from '../entities/restaurant.entity';
 export declare class MenusService {
-    private restaurantsService;
-    private menus;
-    private nextId;
-    constructor(restaurantsService: RestaurantsService);
-    create(restaurantId: number, createMenuDto: CreateMenuDto): Menu;
-    findByRestaurant(restaurantId: number): Menu[];
-    update(restaurantId: number, menuId: number, updateMenuDto: UpdateMenuDto): Menu;
-    remove(restaurantId: number, menuId: number): void;
+    private readonly menuRepository;
+    private readonly restaurantRepository;
+    constructor(menuRepository: Repository<MenuEntity>, restaurantRepository: Repository<RestaurantEntity>);
+    create(restaurantId: number, createMenuDto: CreateMenuDto): Promise<MenuEntity>;
+    findByRestaurant(restaurantId: number): Promise<MenuEntity[]>;
+    update(restaurantId: number, menuId: number, updateMenuDto: UpdateMenuDto): Promise<MenuEntity>;
+    remove(restaurantId: number, menuId: number): Promise<void>;
 }

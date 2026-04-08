@@ -5,61 +5,56 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestaurantsService = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const restaurant_entity_1 = require("../entities/restaurant.entity");
 let RestaurantsService = class RestaurantsService {
-    constructor() {
-        this.restaurants = [];
-        this.nextId = 1;
+    constructor(restaurantRepository) {
+        this.restaurantRepository = restaurantRepository;
     }
-    create(createRestaurantDto) {
+    async create(createRestaurantDto) {
         if (!createRestaurantDto.name || !createRestaurantDto.address) {
             throw new common_1.BadRequestException('Name and address are required.');
         }
-        const restaurant = {
-            id: this.nextId++,
-            name: createRestaurantDto.name,
-            address: createRestaurantDto.address,
-            phone: createRestaurantDto.phone || null,
-            cuisine: createRestaurantDto.cuisine || null,
-            createdAt: new Date().toISOString(),
-        };
-        this.restaurants.push(restaurant);
-        return restaurant;
+        const restaurant = this.restaurantRepository.create({
+            ...createRestaurantDto,
+        });
+        return this.restaurantRepository.save(restaurant);
     }
     findAll() {
-        return this.restaurants;
+        return this.restaurantRepository.find();
     }
-    findOne(id) {
-        const restaurant = this.restaurants.find(r => r.id === id);
+    async findOne(id) {
+        const restaurant = await this.restaurantRepository.findOneBy({ id });
         if (!restaurant) {
             throw new common_1.NotFoundException('Restaurant not found.');
         }
         return restaurant;
     }
-    update(id, updateRestaurantDto) {
-        const restaurant = this.findOne(id);
-        if (updateRestaurantDto.name)
-            restaurant.name = updateRestaurantDto.name;
-        if (updateRestaurantDto.address)
-            restaurant.address = updateRestaurantDto.address;
-        if (updateRestaurantDto.phone !== undefined)
-            restaurant.phone = updateRestaurantDto.phone;
-        if (updateRestaurantDto.cuisine !== undefined)
-            restaurant.cuisine = updateRestaurantDto.cuisine;
-        restaurant.updatedAt = new Date().toISOString();
-        return restaurant;
+    async update(id, updateRestaurantDto) {
+        const restaurant = await this.findOne(id);
+        Object.assign(restaurant, updateRestaurantDto, { updatedAt: new Date() });
+        return this.restaurantRepository.save(restaurant);
     }
-    remove(id) {
-        const index = this.restaurants.findIndex(r => r.id === id);
-        if (index === -1) {
+    async remove(id) {
+        const result = await this.restaurantRepository.delete(id);
+        if (result.affected === 0) {
             throw new common_1.NotFoundException('Restaurant not found.');
         }
-        this.restaurants.splice(index, 1);
     }
 };
 exports.RestaurantsService = RestaurantsService;
 exports.RestaurantsService = RestaurantsService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(restaurant_entity_1.RestaurantEntity)),
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], RestaurantsService);

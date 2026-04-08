@@ -8,53 +8,64 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrdersService = void 0;
 const common_1 = require("@nestjs/common");
-const restaurants_service_1 = require("../restaurants/restaurants.service");
-const tables_service_1 = require("../tables/tables.service");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const order_entity_1 = require("../entities/order.entity");
+const restaurant_entity_1 = require("../entities/restaurant.entity");
+const table_entity_1 = require("../entities/table.entity");
 let OrdersService = class OrdersService {
-    constructor(restaurantsService, tablesService) {
-        this.restaurantsService = restaurantsService;
-        this.tablesService = tablesService;
-        this.orders = [];
-        this.nextId = 1;
+    constructor(orderRepository, restaurantRepository, tableRepository) {
+        this.orderRepository = orderRepository;
+        this.restaurantRepository = restaurantRepository;
+        this.tableRepository = tableRepository;
     }
-    create(createOrderDto) {
+    async create(createOrderDto) {
         const { restaurantId, tableId, items, customerName, status } = createOrderDto;
         if (!restaurantId || !tableId || !Array.isArray(items) || items.length === 0) {
             throw new common_1.BadRequestException('restaurantId, tableId and at least one item are required.');
         }
-        this.restaurantsService.findOne(restaurantId);
-        const table = this.tablesService.findOne(tableId);
+        const restaurant = await this.restaurantRepository.findOneBy({ id: restaurantId });
+        if (!restaurant) {
+            throw new common_1.NotFoundException('Restaurant not found.');
+        }
+        const table = await this.tableRepository.findOneBy({ id: tableId });
+        if (!table) {
+            throw new common_1.NotFoundException('Table not found.');
+        }
         if (table.status === 'occupied') {
             throw new common_1.ConflictException('Table is already occupied.');
         }
-        const order = {
-            id: this.nextId++,
+        const order = this.orderRepository.create({
+            restaurant,
             restaurantId,
+            table,
             tableId,
             items,
             customerName: customerName || 'Guest',
             status: status || 'pending',
-            createdAt: new Date().toISOString(),
-        };
-        this.orders.push(order);
-        this.tablesService.setTableStatus(tableId, 'occupied', order.id);
-        return order;
+        });
+        const savedOrder = await this.orderRepository.save(order);
+        await this.tableRepository.save({ ...table, status: 'occupied', currentOrderId: savedOrder.id });
+        return savedOrder;
     }
     findAll() {
-        return this.orders;
+        return this.orderRepository.find();
     }
-    findOne(id) {
-        const order = this.orders.find(o => o.id === id);
+    async findOne(id) {
+        const order = await this.orderRepository.findOneBy({ id });
         if (!order) {
             throw new common_1.NotFoundException('Order not found.');
         }
         return order;
     }
-    update(id, updateOrderDto) {
-        const order = this.findOne(id);
+    async update(id, updateOrderDto) {
+        const order = await this.findOne(id);
         if (updateOrderDto.items)
             order.items = updateOrderDto.items;
         if (updateOrderDto.customerName)
@@ -62,14 +73,14 @@ let OrdersService = class OrdersService {
         if (updateOrderDto.status) {
             order.status = updateOrderDto.status;
             if (updateOrderDto.status === 'completed' || updateOrderDto.status === 'cancelled') {
-                this.tablesService.releaseTable(order.tableId, order.id);
+                await this.releaseTable(order.tableId, order.id);
             }
         }
-        order.updatedAt = new Date().toISOString();
-        return order;
+        order.updatedAt = new Date();
+        return this.orderRepository.save(order);
     }
-    complete(id) {
-        const order = this.findOne(id);
+    async complete(id) {
+        const order = await this.findOne(id);
         if (order.status === 'completed') {
             throw new common_1.BadRequestException('Order is already completed.');
         }
@@ -77,23 +88,37 @@ let OrdersService = class OrdersService {
             throw new common_1.BadRequestException('Cancelled orders cannot be completed.');
         }
         order.status = 'completed';
-        order.updatedAt = new Date().toISOString();
-        this.tablesService.releaseTable(order.tableId, order.id);
-        return order;
+        order.updatedAt = new Date();
+        const savedOrder = await this.orderRepository.save(order);
+        await this.releaseTable(order.tableId, order.id);
+        return savedOrder;
     }
-    remove(id) {
-        const index = this.orders.findIndex(o => o.id === id);
-        if (index === -1) {
+    async remove(id) {
+        const order = await this.orderRepository.findOneBy({ id });
+        if (!order) {
             throw new common_1.NotFoundException('Order not found.');
         }
-        const order = this.orders[index];
-        this.tablesService.releaseTable(order.tableId, order.id);
-        this.orders.splice(index, 1);
+        if (order.tableId) {
+            await this.releaseTable(order.tableId, order.id);
+        }
+        await this.orderRepository.delete(id);
+    }
+    async releaseTable(tableId, currentOrderId) {
+        const table = await this.tableRepository.findOneBy({ id: tableId });
+        if (table && table.currentOrderId === currentOrderId) {
+            table.status = 'available';
+            table.currentOrderId = null;
+            await this.tableRepository.save(table);
+        }
     }
 };
 exports.OrdersService = OrdersService;
 exports.OrdersService = OrdersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [restaurants_service_1.RestaurantsService,
-        tables_service_1.TablesService])
+    __param(0, (0, typeorm_1.InjectRepository)(order_entity_1.OrderEntity)),
+    __param(1, (0, typeorm_1.InjectRepository)(restaurant_entity_1.RestaurantEntity)),
+    __param(2, (0, typeorm_1.InjectRepository)(table_entity_1.TableEntity)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
+        typeorm_2.Repository])
 ], OrdersService);

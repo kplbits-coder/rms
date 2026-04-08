@@ -23,17 +23,17 @@ let RestaurantsController = class RestaurantsController {
     findAll() {
         return this.restaurantsService.findAll();
     }
-    create(createRestaurantDto) {
+    async create(createRestaurantDto) {
         return this.restaurantsService.create(createRestaurantDto);
     }
-    findOne(id) {
+    async findOne(id) {
         return this.restaurantsService.findOne(id);
     }
-    update(id, updateRestaurantDto) {
+    async update(id, updateRestaurantDto) {
         return this.restaurantsService.update(id, updateRestaurantDto);
     }
-    remove(id) {
-        this.restaurantsService.remove(id);
+    async remove(id) {
+        await this.restaurantsService.remove(id);
         return {};
     }
 };
@@ -49,14 +49,14 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [restaurants_dto_1.CreateRestaurantDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], RestaurantsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], RestaurantsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Put)(':id'),
@@ -64,14 +64,14 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, restaurants_dto_1.UpdateRestaurantDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], RestaurantsController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], RestaurantsController.prototype, "remove", null);
 exports.RestaurantsController = RestaurantsController = __decorate([
     (0, common_1.Controller)('restaurants'),

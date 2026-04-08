@@ -3,9 +3,9 @@ import { CreateTableDto, UpdateTableDto } from './tables.dto';
 export declare class TablesController {
     private readonly tablesService;
     constructor(tablesService: TablesService);
-    findAll(): import("./tables.service").Table[];
-    create(createTableDto: CreateTableDto): import("./tables.service").Table;
-    findOne(id: number): import("./tables.service").Table;
-    update(id: number, updateTableDto: UpdateTableDto): import("./tables.service").Table;
-    remove(id: number): {};
+    findAll(): Promise<import("../entities/table.entity").TableEntity[]>;
+    create(createTableDto: CreateTableDto): Promise<import("../entities/table.entity").TableEntity>;
+    findOne(id: number): Promise<import("../entities/table.entity").TableEntity>;
+    update(id: number, updateTableDto: UpdateTableDto): Promise<import("../entities/table.entity").TableEntity>;
+    remove(id: number): Promise<{}>;
 }

@@ -20,23 +20,23 @@ let OrdersController = class OrdersController {
     constructor(ordersService) {
         this.ordersService = ordersService;
     }
-    findAll() {
+    async findAll() {
         return this.ordersService.findAll();
     }
-    create(createOrderDto) {
+    async create(createOrderDto) {
         return this.ordersService.create(createOrderDto);
     }
-    findOne(id) {
+    async findOne(id) {
         return this.ordersService.findOne(id);
     }
-    update(id, updateOrderDto) {
+    async update(id, updateOrderDto) {
         return this.ordersService.update(id, updateOrderDto);
     }
-    complete(id) {
+    async complete(id) {
         return this.ordersService.complete(id);
     }
-    remove(id) {
-        this.ordersService.remove(id);
+    async remove(id) {
+        await this.ordersService.remove(id);
         return {};
     }
 };
@@ -45,21 +45,21 @@ __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [orders_dto_1.CreateOrderDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Put)(':id'),
@@ -67,21 +67,21 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, orders_dto_1.UpdateOrderDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "update", null);
 __decorate([
     (0, common_1.Post)(':id/complete'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "complete", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "remove", null);
 exports.OrdersController = OrdersController = __decorate([
     (0, common_1.Controller)('orders'),
