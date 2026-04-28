@@ -15,10 +15,8 @@ const restaurants_module_1 = require("./restaurants/restaurants.module");
 const menus_module_1 = require("./menus/menus.module");
 const tables_module_1 = require("./tables/tables.module");
 const orders_module_1 = require("./orders/orders.module");
-const restaurant_entity_1 = require("./entities/restaurant.entity");
-const menu_entity_1 = require("./entities/menu.entity");
-const table_entity_1 = require("./entities/table.entity");
-const order_entity_1 = require("./entities/order.entity");
+const seed_module_1 = require("./seed/seed.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -26,9 +24,9 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             typeorm_1.TypeOrmModule.forRoot({
-                type: 'sqlite',
-                database: 'database.sqlite',
-                entities: [restaurant_entity_1.RestaurantEntity, menu_entity_1.MenuEntity, table_entity_1.TableEntity, order_entity_1.OrderEntity],
+                type: "sqlite",
+                database: "database.sqlite",
+                entities: [__dirname + "/**/*.entity{.ts,.js}"],
                 synchronize: true,
                 logging: false,
             }),
@@ -36,6 +34,8 @@ exports.AppModule = AppModule = __decorate([
             menus_module_1.MenusModule,
             tables_module_1.TablesModule,
             orders_module_1.OrdersModule,
+            seed_module_1.SeedModule,
+            auth_module_1.AuthModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
